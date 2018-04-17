@@ -66,7 +66,7 @@ Generates a challenge developers can sign and use in the `Authenticate` call to 
 
 Name|Type|Description
 ----|----|-----------
-apiKey|string|A valid  API key for your account.
+apiKey | string | A valid  API key for your account.
 
 #### Response
 A string of challenge data to be used in `Authenticate`.
@@ -80,10 +80,11 @@ Verifies a user’s identity to the server and begins receiving account-level no
 To receive the account-level notifications enabled by authenticating, the caller must register callbacks for the `uO` and `uB` events through their SignalR client. See [Appendix B](#appendix-b-callbacks-and-payloads) for event payload details and see the [sample code](./samples/WebsocketSample.cs) for an example of how to subscribe using the C# SignalR library.
 
 #### Parameters
+
 Name|Type|Description
 ----|----|-----------
-apiKey|string|A valid  API key for your account.
-response|string|Signed challenge from `GetAuthContext`.
+apiKey | string | A valid  API key for your account.
+response | string | Signed challenge from `GetAuthContext`.
 
 #### Response
 Boolean indication of success or failure.
@@ -95,9 +96,11 @@ Boolean indication of success or failure.
 Allows the caller to retrieve the full order book for a specific market.
 
 #### Parameters
+
 Name|Type|Description
 ----|----|-----------
-marketName|string|The market identifier, e.g. `BTC-ETH`.
+marketName | string | The market identifier, e.g. `BTC-ETH`.
+
 
 #### Response
 JSON object containing market state.
@@ -176,7 +179,7 @@ _**Note:** This feed only contains updates to exchange state. To form a complete
 #### Parameters
 Name|Type|Description
 ----|----|-----------
-marketName|String|The market identifier, e.g. BTC-ETH
+marketName | String | The market identifier, e.g. BTC-ETH
 
 #### Response
 Boolean indicating whether the user was subscribed to the feed.
