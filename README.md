@@ -1,11 +1,9 @@
-# Bittrex Beta API Documentation
+# Bittrex Websocket API Documentation
 ## Overview
-On March 27, 2018, Bittrex released the Beta version of its new website, which includes several performance, usability, and security improvements to our API. 
-
-The following sections detail the most significant changes. Anyone using the Bittrex API should read carefully the information below to understand whether there are any potential impacts to their systems. While unlikely, if we determine additional API changes are needed during our Beta site testing, we will provide users the updated information when the official website launches. 
+Bittrex has released an initial version of its Websocket API.
 
 ### Access to Account and Exchange Data
-We have identified common API patterns used by bots and other trading software to obtain up-to-date information from Bittrex. In order to help streamline the process for developers and to prevent potentially abusive behavior, we are providing new methods for accessing account and exchange data, and we strongly encourage all developers to leverage these tools. (See [API Best Practices](#api-best-practices))
+We have identified common REST API patterns used by bots and other trading software to obtain up-to-date information from Bittrex. In order to help streamline the process for developers and to prevent potentially abusive behavior, we are providing Websocket-based methods for accessing account and exchange data, and we strongly encourage all developers to leverage these tools. (See [API Best Practices](#api-best-practices))
 
 ### Throttling
 Improper API use affects the efficiency of the platform for our customers, and we have enabled throttling on all endpoints to mitigate the adverse effects of this improper behavior. Accounts will be permitted to make a maximum of 60 API calls per minute, and calls after the limit will fail, with throttle settings automatically resetting at the start of the next minute.
@@ -15,8 +13,6 @@ _**Note:** Corporate and high-volume accounts may contact customer support for a
 ### Websocket API (WS API)
 To help ensure these changes do not present issues for customers, we are encouraging developers to use our Websocket API to have the most commonly-requested data pushed to them instead of needing to poll the REST API. The WS API supplies public market data (e.g. exchange status, summary ticks) and account-level information such as order and balance status.
 
-
-
 ## API Best Practices
 Below, users may find best practices for the most common API scenarios. By implementing these recommendations, customers using API may ensure timely access to account and exchange data while minimizing the possibility of being throttled due to improper use or blacklisted due to suspected malicious behavior.
 
@@ -25,8 +21,6 @@ Instead of polling the REST-based account and market APIs for open order and bal
 
 ### Tracking an Order Book
 Many users poll the REST API as quickly as possible for updated order data. At very high call rates, the API most often returns the same data because we only update it **_once per second_**. By using the WS API’s `QueryExchangeState` and `SubscribeToExchangeDeltas` functions, developers can maintain their own copies of one or more order books.
-
-
 
 ## WS API Overview
 The Bittrex Websocket API is implemented using [SignalR](https://www.asp.net/signalr), and while several SignalR clients exist for different languages, if one is not available for your environment, you will need to write one.
@@ -44,8 +38,10 @@ Type|Description
 `int` | signed 32-bit integer
 `long` | signed 64-bit integer
 
+_*Note:* the `decimal` type is not correctly encoded in the current release. See [Beta Issue #15](https://github.com/Bittrex/beta/issues/15)._
+
 ### Connecting
-The Beta WS API endpoint is https://beta.bittrex.com/signalr. Once connected, be sure to connect to the `c2` hub. No other hubs are supported for use by Bittrex customers.
+The WS API endpoint is https://socket.bittrex.com/signalr. Once connected, be sure to connect to the `c2` hub. No other hubs are supported for use by Bittrex customers.
 
 ### Response Handling
 All responses are compressed by the server using GZip (via a 'deflate' API - there are no headers) and base64 encoded prior to transmission. Users must reverse this process to retrieve the JSON payload. Further, field keys in the response JSON are minified. [Appendix A](#appendix-a-minified-json-keys) contains a table of the keys and their un-minified counterparts.
@@ -71,6 +67,7 @@ Generates a challenge developers can sign and use in the `Authenticate` call to 
 Name|Type|Description
 ----|----|-----------
 apiKey|string|A valid  API key for your account.
+
 #### Response
 A string of challenge data to be used in `Authenticate`.
 
@@ -81,11 +78,13 @@ A string of challenge data to be used in `Authenticate`.
 Verifies a user’s identity to the server and begins receiving account-level notifications. Users must sign the challenge returned by `GetAuthContext` using the [v1.1 API's](https://bittrex.com/Home/Api) request signing method before calling this function.
 
 To receive the account-level notifications enabled by authenticating, the caller must register callbacks for the `uO` and `uB` events through their SignalR client. See [Appendix B](#appendix-b-callbacks-and-payloads) for event payload details and see the [sample code](./samples/WebsocketSample.cs) for an example of how to subscribe using the C# SignalR library.
+
 #### Parameters
 Name|Type|Description
 ----|----|-----------
 apiKey|string|A valid  API key for your account.
 response|string|Signed challenge from `GetAuthContext`.
+
 #### Response
 Boolean indication of success or failure.
 
@@ -94,10 +93,12 @@ Boolean indication of success or failure.
 ### `QueryExchangeState`
 #### Description
 Allows the caller to retrieve the full order book for a specific market.
+
 #### Parameters
 Name|Type|Description
 ----|----|-----------
 marketName|string|The market identifier, e.g. `BTC-ETH`.
+
 #### Response
 JSON object containing market state.
 ```
@@ -171,10 +172,12 @@ JSON object containing state data for all markets.
 Allows the caller to receive real-time updates to the state of a single market. The caller must register a callback for the uE event through their SignalR client. Upon subscribing, the callback will be invoked with market deltas as they occur. See [Appendix B](#appendix-b-callbacks-and-payloads) for event payload details and see the [sample code](./samples/WebsocketSample.cs) for an example of how to subscribe using the C# SignalR library.
 
 _**Note:** This feed only contains updates to exchange state. To form a complete picture of exchange state, users must first call QueryExchangeState and merge deltas into the data structure returned in that call._
+
 #### Parameters
 Name|Type|Description
 ----|----|-----------
 marketName|String|The market identifier, e.g. BTC-ETH
+
 #### Response
 Boolean indicating whether the user was subscribed to the feed.
 
