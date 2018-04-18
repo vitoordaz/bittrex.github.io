@@ -50,7 +50,7 @@ All responses are compressed by the server using GZip (via a 'deflate' API - the
 Once connected, developers can obtain account-level data using the following steps:
 
 1.	Obtain an authentication challenge by calling `GetAuthContext`.
-2.	Sign the challenge using the request-signing method documented in the [v1.1 API](https://bittrex.com/Home/Api).
+2.	Sign the challenge ([example](https://github.com/Bittrex/bittrex.github.io/blob/master/samples/WebsocketSample.cs#L91)).
 3.	Call `Authenticate`.
 
 The details for each API call are documented in the next section.
@@ -75,7 +75,7 @@ A string of challenge data to be used in `Authenticate`.
 
 ### `Authenticate`
 #### Description
-Verifies a user’s identity to the server and begins receiving account-level notifications. Users must sign the challenge returned by `GetAuthContext` using the [v1.1 API's](https://bittrex.com/Home/Api) request signing method before calling this function.
+Verifies a user’s identity to the server and begins receiving account-level notifications. Users must sign the challenge returned by `GetAuthContext` before calling this function.
 
 To receive the account-level notifications enabled by authenticating, the caller must register callbacks for the `uO` and `uB` events through their SignalR client. See [Appendix B](#appendix-b-callbacks-and-payloads) for event payload details and see the [sample code](./samples/WebsocketSample.cs) for an example of how to subscribe using the C# SignalR library.
 
@@ -177,6 +177,7 @@ Allows the caller to receive real-time updates to the state of a single market. 
 _**Note:** This feed only contains updates to exchange state. To form a complete picture of exchange state, users must first call QueryExchangeState and merge deltas into the data structure returned in that call._
 
 #### Parameters
+
 Name|Type|Description
 ----|----|-----------
 marketName | String | The market identifier, e.g. BTC-ETH
