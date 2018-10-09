@@ -146,7 +146,7 @@ Allows the caller to retrieve the full state for all markets.
 JSON object containing state data for all markets.
 ```
 {
-    Nonce     : int,
+    Nounce    : int,
     Summaries : 
     [
         {
